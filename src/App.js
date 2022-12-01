@@ -67,12 +67,12 @@ const ReactSlide = ({ children, onSlideOut }) => {
   const bindListeners = React.useCallback(
     (elRef, state) => {
       if (state === "bind" && elRef && elRef.current) {
-        window.addEventListener("mouseup", mouseUpListener);
         elRef.current.addEventListener("mousedown", mouseDownListener);
         elRef.current.addEventListener("mousemove", mouseMoveListener);
+        window.addEventListener("mouseup", mouseUpListener);
       } else if (state === "unbind" && elRef && elRef.current) {
-        elCurrent.removeEventListener("mousedown", mouseDownListener);
-        elCurrent.removeEventListener("mousemove", mouseMoveListener);
+        elRef.removeEventListener("mousedown", mouseDownListener);
+        elRef.removeEventListener("mousemove", mouseMoveListener);
         window.removeEventListener("mouseup", mouseUpListener);
       }
     },
@@ -86,7 +86,7 @@ const ReactSlide = ({ children, onSlideOut }) => {
       bindListeners(elRef, "bind");
     }
     return () => {
-      bindListeners(elCurrent, "unbind");
+      bindListeners(elCopy, "unbind");
     };
   }, [
     elRef,
