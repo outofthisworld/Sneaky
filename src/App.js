@@ -71,8 +71,8 @@ const ReactSlide = ({ children, onSlideOut }) => {
         elRef.current.addEventListener("mousemove", mouseMoveListener);
         window.addEventListener("mouseup", mouseUpListener);
       } else if (state === "unbind" && elRef && elRef.current) {
-        elRef.removeEventListener("mousedown", mouseDownListener);
-        elRef.removeEventListener("mousemove", mouseMoveListener);
+        elRef.current.removeEventListener("mousedown", mouseDownListener);
+        elRef.current.removeEventListener("mousemove", mouseMoveListener);
         window.removeEventListener("mouseup", mouseUpListener);
       }
     },
