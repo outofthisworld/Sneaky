@@ -34,41 +34,47 @@ const ReactSlide = ({ children, onSlideOut }) => {
     };
   }, [stateRef, setState]);
 
-  const mouseMoveListener = React.useMemo(
-    () => (e) => {
-      let passedThreshold = false;
-
+  const mouseMoveListener = React.useMemo(() => {
+    let passedThreshold = false;
+    const pastThresholdAction = () => {
+      stateRef.current.onSlideOut();
+      elRef.current.style.left = "0px";
+      elRef.current.dispatchEvent(
+        new MouseEvent("mouseup", {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+          /* whatever properties you want to give it */
+        })
+      );
+    };
+    return (e) => {
       if (stateRef.current.mousedown && elRef.current) {
         const dx = (e.clientX - stateRef.current.x) * 0.65;
         if (dx > 0) {
           elRef.current.style.left = `${dx}px`;
           if (dx >= 200 && !passedThreshold) {
             passedThreshold = true;
-
-            stateRef.current.onSlideOut();
-            elRef.current.style.left = "0px";
-            elRef.current.dispatchEvent(
-              new MouseEvent("mouseup", {
-                view: window,
-                bubbles: true,
-                cancelable: true
-                /* whatever properties you want to give it */
-              })
-            );
+            pastThresholdAction();
           } else if (dx < 200) {
             passedThreshold = false;
           }
         }
       }
-    },
-    [stateRef, elRef]
-  );
+    };
+  }, [stateRef, elRef]);
 
   const bindListeners = React.useCallback(
-    (elRef) => {
-      window.addEventListener("mouseup", mouseUpListener);
-      elRef.current.addEventListener("mousedown", mouseDownListener);
-      elRef.current.addEventListener("mousemove", mouseMoveListener);
+    (elRef, state) => {
+      if (state === "bind" && elRef && elRef.current) {
+        window.addEventListener("mouseup", mouseUpListener);
+        elRef.current.addEventListener("mousedown", mouseDownListener);
+        elRef.current.addEventListener("mousemove", mouseMoveListener);
+      } else if (state === "unbind" && elRef && elRef.current) {
+        elCurrent.removeEventListener("mousedown", mouseDownListener);
+        elCurrent.removeEventListener("mousemove", mouseMoveListener);
+        window.removeEventListener("mouseup", mouseUpListener);
+      }
     },
     [mouseDownListener, mouseUpListener, mouseMoveListener]
   );
@@ -77,21 +83,17 @@ const ReactSlide = ({ children, onSlideOut }) => {
     const elCopy = elRef;
     const elCurrent = elRef.current;
     if (elCopy && elCurrent) {
-      bindListeners(elRef);
+      bindListeners(elRef, "bind");
     }
     return () => {
-      if (elCurrent) {
-        elCurrent.removeEventListener("mousedown", mouseDownListener);
-        elCurrent.removeEventListener("mousemove", mouseMoveListener);
-      }
-      window.removeEventListener("mouseup", mouseUpListener);
+      bindListeners(elCurrent, "unbind");
     };
   }, [
     elRef,
     bindListeners,
     mouseDownListener,
     mouseUpListener,
-    mouseMoveListener
+    mouseMoveListener,
   ]);
 
   return (
@@ -102,7 +104,7 @@ const ReactSlide = ({ children, onSlideOut }) => {
           position: "relative",
           left: 0,
           transition: "all 0.1s linear",
-          overflow: "hidden"
+          overflow: "hidden",
         }}
       >
         {children}
@@ -115,20 +117,20 @@ export default function () {
   const [showDelete, setShowDelete] = React.useState(null);
   const [items, setItems] = React.useState([
     {
-      name: "Dale"
+      name: "Dale",
     },
     {
-      name: "Jitu"
+      name: "Jitu",
     },
     {
-      name: "Monty"
+      name: "Monty",
     },
     {
-      name: "Joseph"
+      name: "Joseph",
     },
     {
-      name: "Luke"
-    }
+      name: "Luke",
+    },
   ]);
 
   const removeItem = (index) => {
@@ -164,7 +166,7 @@ export default function () {
           textAlign: "center",
           visibility: showDelete ? "visible" : "hidden",
           opacity: showDelete ? "1" : "0",
-          transition: "all 0.2s linear"
+          transition: "all 0.2s linear",
         }}
       >
         <h1>Delete this item?</h1>
