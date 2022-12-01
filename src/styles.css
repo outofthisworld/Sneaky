@@ -1,0 +1,30 @@
+.app {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 40px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+html,
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.item {
+  padding: 20px;
+  margin-top: 5px;
+  background: rgb(152, 110, 187);
+  color: #fff;
+}
+
+.no-select {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                supported by Chrome, Edge, Opera and Firefox */
+}
